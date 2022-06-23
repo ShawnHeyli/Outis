@@ -1,0 +1,19 @@
+name: Rust Build CI
+
+on:
+  push:
+    branches: ["main", "hotfix", "release", "develop"]
+  pull_request:
+    branches: ["main", "hotfix", "release", "develop"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: cargo build --verbose
