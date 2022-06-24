@@ -1,4 +1,6 @@
 [package]
+author = "Hilan Meyran"
+about = "CLI tool to generate 'fake' GitHub activity"
 name = "pênelópeia"
 version = "0.1.0"
 edition = "2021"
