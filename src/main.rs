@@ -1,5 +1,5 @@
 use clap::Parser;
-use std::env;
+use git2::Repository;
 
 #[derive(Parser)]
 struct Cli {
@@ -8,4 +8,10 @@ struct Cli {
     path: String,
 }
 
-fn main() {}
+fn main() {
+    let args = Cli::parse();
+    let repo = match Repository::init(args.path) {
+        Ok(repo) => repo,
+        Err(e) => panic!("failed to init: {}", e),
+    };
+}
