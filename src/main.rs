@@ -30,3 +30,5 @@ fn format_date_args(date_string: &str) -> Result<NaiveDate, String> {
         Err(err) => Err(err.to_string()),
     }
 }
+
+fn main() {}
