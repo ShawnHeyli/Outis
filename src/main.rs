@@ -23,4 +23,10 @@ struct Cli {
     end_date: NaiveDate,
 }
 
-fn main() {}
+fn format_date_args(date_string: &str) -> Result<NaiveDate, String> {
+    let date = NaiveDate::parse_from_str(date_string, "%Y-%m-%d");
+    match date {
+        Ok(date) => Ok(date),
+        Err(err) => Err(err.to_string()),
+    }
+}
