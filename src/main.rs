@@ -1,11 +1,13 @@
+use std::path::PathBuf;
+
 use clap::Parser;
 use git2::Repository;
 
 #[derive(Parser)]
 struct Cli {
     /// Path of the initialized repository
-    #[clap(short, long)]
-    path: String,
+    #[clap(short, long, parse(from_os_str), default_value = "./fake-repo")]
+    path: PathBuf,
 }
 
 fn main() {
