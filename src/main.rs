@@ -1,5 +1,7 @@
 use chrono::{Datelike, NaiveDate, Utc};
 use clap::Parser;
+use git2::Repository;
+use std::path::PathBuf;
 
 #[derive(Parser)]
 #[clap(author, version, about)]
@@ -21,6 +23,9 @@ struct Cli {
     /// Format : YYYY-MM-DD
     #[clap(long, value_parser = format_date_args, default_value_t = Utc::today().naive_utc())]
     end_date: NaiveDate,
+
+    #[clap(short, long, parse(from_os_str), default_value = "./fake-repo")]
+    path: PathBuf,
 }
 
 fn format_date_args(date_string: &str) -> Result<NaiveDate, String> {
@@ -31,4 +36,10 @@ fn format_date_args(date_string: &str) -> Result<NaiveDate, String> {
     }
 }
 
-fn main() {}
+fn main() {
+    let args = Cli::parse();
+    let repo = match Repository::init(args.path) {
+        Ok(repo) => repo,
+        Err(e) => panic!("failed to init: {}", e),
+    };
+}
