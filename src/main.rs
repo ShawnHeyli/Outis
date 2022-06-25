@@ -1,7 +1,7 @@
-use std::path::PathBuf;
-
 use clap::Parser;
-use git2::Repository;
+use std::fs::create_dir;
+use std::path::PathBuf;
+use std::process::Command;
 
 #[derive(Parser)]
 struct Cli {
@@ -49,9 +49,16 @@ fn create_commit(message: &str, date: &str, repo_path: &PathBuf) {
 }
 
 fn main() {
+    // Parse the command line arguments
     let args = Cli::parse();
-    let repo = match Repository::init(args.path) {
-        Ok(repo) => repo,
-        Err(e) => panic!("failed to init: {}", e),
-    };
+
+    // Initialize git repository
+    create_dir(&args.path).expect("failed to create a directory");
+    Command::new("git")
+        .args(&["init", "--quiet"])
+        .current_dir(&args.path)
+        .status()
+        .expect("failed to initialize git repository");
+
+    create_commit("fake commit", "Wed Feb 16 14:00 2011 +0100", &args.path);
 }
