@@ -117,7 +117,7 @@ fn main() {
 
         // Commit only if the probability is met
         let committed: f32 = rand::thread_rng().gen_range(0.0..1.0);
-        if committed < args.probability {
+        if committed > args.probability {
             current_date = current_date + chrono::Duration::days(1);
             continue;
         }
