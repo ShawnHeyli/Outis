@@ -87,5 +87,15 @@ fn main() {
         .status()
         .expect("failed to initialize git repository");
 
-    create_commit("fake commit", "Wed Feb 16 14:00 2011 +0100", &args.path);
+    // For each day in the range, commit a random number of times
+    let mut current_date = args.start_date;
+    while current_date <= args.end_date {
+        create_commit(
+            "fake commit",
+            &current_date.format("%Y-%m-%d").to_string(),
+            &args.path,
+        );
+
+        current_date = current_date + chrono::Duration::days(1);
+    }
 }
