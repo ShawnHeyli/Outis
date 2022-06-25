@@ -90,6 +90,17 @@ fn main() {
     // For each day in the range, commit a random number of times
     let mut current_date = args.start_date;
     while current_date <= args.end_date {
+        if args.workdays && current_date.weekday() == chrono::Weekday::Sat {
+            println!("Skipping {}", current_date.to_string());
+            current_date = current_date + chrono::Duration::days(2);
+            continue;
+        }
+        if args.workdays && current_date.weekday() == chrono::Weekday::Sun {
+            println!("Skipping {}", current_date.to_string());
+            current_date = current_date + chrono::Duration::days(1);
+            continue;
+        }
+
         create_commit(
             "fake commit",
             &current_date.format("%Y-%m-%d").to_string(),
