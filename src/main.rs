@@ -72,7 +72,7 @@ fn create_commit(message: &str, date: &str, repo_path: &PathBuf) {
         ])
         .current_dir(repo_path)
         .status()
-        .expect("failed to create a commit")
+        .expect("failed to create a commit");
 }
 
 fn main() {
