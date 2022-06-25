@@ -1,5 +1,6 @@
 use chrono::{Datelike, NaiveDate, Utc};
 use clap::Parser;
+use rand::Rng;
 use std::fs::create_dir;
 use std::path::PathBuf;
 use std::process::Command;
@@ -101,11 +102,12 @@ fn main() {
             continue;
         }
 
-        create_commit(
-            "fake commit",
-            &current_date.format("%Y-%m-%d").to_string(),
-            &args.path,
-        );
+        let commit_count = rand::thread_rng().gen_range(1..=args.max_commits);
+        for _ in 0..commit_count {
+            let message = format!("Commit {}", current_date.to_string());
+            let date = current_date.to_string();
+            create_commit(&message, &date, &args.path);
+        }
 
         current_date = current_date + chrono::Duration::days(1);
     }
