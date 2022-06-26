@@ -1,9 +1,12 @@
 [package]
-author = "Hilan Meyran"
-about = "CLI tool to generate 'fake' GitHub activity"
+authors = ["Hilan Meyran <hilanmeyran@proton.me>"]
+description = "CLI tool to generate 'fake' GitHub activity"
 name = "pênelópeia"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
+repository = "https://github.com/ShawnHeyli/Penelopeia"
+publish = false
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -11,3 +14,4 @@ edition = "2021"
 rand = "0.8.5"
 chrono = "0.4"
 clap = { version = "3.2.6", features = ["derive"] }
+indicatif = "0.16.2"
