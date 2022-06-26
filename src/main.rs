@@ -2,7 +2,7 @@ use chrono::{Datelike, NaiveDate, Utc};
 use clap::Parser;
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::Rng;
-use std::fs::create_dir;
+use std::fs::create_dir_all;
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -32,10 +32,12 @@ struct Cli {
     #[clap(long, value_parser = format_date_args, default_value_t = Utc::today().naive_utc())]
     end_date: NaiveDate,
 
+    /// Path to the directory to commit in (a directory will be created if it doesn't exist)
     #[clap(short, long, parse(from_os_str), default_value = "./fake-repo")]
     path: PathBuf,
 }
 
+// Check the format of the date arguments (YYYY-MM-DD)
 fn format_date_args(date_string: &str) -> Result<NaiveDate, String> {
     let date = NaiveDate::parse_from_str(date_string, "%Y-%m-%d");
     match date {
@@ -44,6 +46,7 @@ fn format_date_args(date_string: &str) -> Result<NaiveDate, String> {
     }
 }
 
+// Check the probability argument (0.0 = never, 1.0 = always)
 fn check_probability(probability: &str) -> Result<f32, String> {
     let probability = probability.parse::<f32>().unwrap();
     if probability < 0.0 || probability > 1.0 {
@@ -52,6 +55,7 @@ fn check_probability(probability: &str) -> Result<f32, String> {
     Ok(probability)
 }
 
+// Create a commit on windows
 #[cfg(target_family = "windows")]
 fn create_commit(message: &str, date: &str, repo_path: &PathBuf) {
     Command::new("cmd")
@@ -71,6 +75,7 @@ fn create_commit(message: &str, date: &str, repo_path: &PathBuf) {
         .expect("failed to create a commit");
 }
 
+// Create a commit on Unix
 #[cfg(target_family = "unix")]
 fn create_commit(message: &str, date: &str, repo_path: &PathBuf) {
     Command::new("sh")
@@ -93,27 +98,17 @@ fn create_commit(message: &str, date: &str, repo_path: &PathBuf) {
 fn main() {
     // Parse the command line arguments
     let args = Cli::parse();
+    let total_days = (args.end_date - args.start_date).num_days();
 
     // Create a spinner
     let spinner_style = ProgressStyle::default_spinner()
-        .tick_strings(&[
-            "🤜      🤛",
-            "🤜      🤛",
-            " 🤜    🤛 ",
-            "  🤜  🤛  ",
-            "   🤜🤛   ",
-            "  🤜✨🤛  ",
-            " 🤜 ✨ 🤛 ",
-            "🤜  ✨  🤛",
-            "🤜  ✨  🤛",
-        ])
+        .tick_strings(&["🤘", "🤟", "🖖", "✋", "🤚", "👆", "🖐", "🤙"])
         .template("{elapsed} {spinner} {prefix:.bold.dim} {msg}");
-
     let spinner = ProgressBar::new_spinner();
     spinner.set_style(spinner_style);
 
     // Initialize git repository
-    create_dir(&args.path).expect("failed to create a directory");
+    create_dir_all(&args.path).expect("failed to create a directory");
     Command::new("git")
         .args(&["init", "--quiet"])
         .current_dir(&args.path)
@@ -125,12 +120,10 @@ fn main() {
     let mut total_commits = 0;
     while current_date <= args.end_date {
         if args.workdays && current_date.weekday() == chrono::Weekday::Sat {
-            println!("Skipping {}", current_date.to_string());
             current_date = current_date + chrono::Duration::days(2);
             continue;
         }
         if args.workdays && current_date.weekday() == chrono::Weekday::Sun {
-            println!("Skipping {}", current_date.to_string());
             current_date = current_date + chrono::Duration::days(1);
             continue;
         }
@@ -155,5 +148,8 @@ fn main() {
         current_date = current_date + chrono::Duration::days(1);
     }
 
-    spinner.finish_with_message(format!("Created a total of {} commits", total_commits));
+    spinner.finish_with_message(format!(
+        "Created a total of {} commits over {} days",
+        total_commits, total_days
+    ));
 }
