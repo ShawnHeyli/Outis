@@ -1,5 +1,6 @@
 use chrono::{Datelike, NaiveDate, Utc};
 use clap::Parser;
+use indicatif::{ProgressBar, ProgressStyle};
 use rand::Rng;
 use std::fs::create_dir;
 use std::path::PathBuf;
@@ -93,6 +94,24 @@ fn main() {
     // Parse the command line arguments
     let args = Cli::parse();
 
+    // Create a spinner
+    let spinner_style = ProgressStyle::default_spinner()
+        .tick_strings(&[
+            "🤜      🤛",
+            "🤜      🤛",
+            " 🤜    🤛 ",
+            "  🤜  🤛  ",
+            "   🤜🤛   ",
+            "  🤜✨🤛  ",
+            " 🤜 ✨ 🤛 ",
+            "🤜  ✨  🤛",
+            "🤜  ✨  🤛",
+        ])
+        .template("{elapsed} {spinner} {prefix:.bold.dim} {msg}");
+
+    let spinner = ProgressBar::new_spinner();
+    spinner.set_style(spinner_style);
+
     // Initialize git repository
     create_dir(&args.path).expect("failed to create a directory");
     Command::new("git")
@@ -103,6 +122,7 @@ fn main() {
 
     // For each day in the range, commit a random number of times
     let mut current_date = args.start_date;
+    let mut total_commits = 0;
     while current_date <= args.end_date {
         if args.workdays && current_date.weekday() == chrono::Weekday::Sat {
             println!("Skipping {}", current_date.to_string());
@@ -122,13 +142,18 @@ fn main() {
             continue;
         }
 
+        // Commit a random number of times
+        spinner.set_message(format!("Committing for the {}", current_date.to_string()));
         let commit_count = rand::thread_rng().gen_range(1..=args.max_commits);
         for _ in 0..commit_count {
             let message = format!("Commit {}", current_date.to_string());
             let date = current_date.to_string();
             create_commit(&message, &date, &args.path);
+            total_commits += 1;
         }
 
         current_date = current_date + chrono::Duration::days(1);
     }
+
+    spinner.finish_with_message(format!("Created a total of {} commits", total_commits));
 }
