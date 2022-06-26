@@ -11,3 +11,4 @@ edition = "2021"
 rand = "0.8.5"
 chrono = "0.4"
 clap = { version = "3.2.6", features = ["derive"] }
+indicatif = "0.16.2"
